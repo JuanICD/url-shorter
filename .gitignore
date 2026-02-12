@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# pnpm
+.pnpm-store/
+
+# TypeScript
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+#.env file
+.env
+
+# IDE
+.idea/
+/src/generated/prisma
