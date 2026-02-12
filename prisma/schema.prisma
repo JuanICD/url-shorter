@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Link {
+  id        Int      @id @default(autoincrement())
+  baseURL   String   @db.Text
+  shortURL  String   @unique
+  createdAt DateTime @default(now())
+  clicks    Int      @default(0)
+
+  // Relacion: Cada objeto Link pertenece a 1 usuario
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String?
+
+  // Relacion: 1 usuario tiene un listado de links
+  links Link[]
+}
