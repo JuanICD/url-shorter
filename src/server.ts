@@ -1,10 +1,23 @@
-import express from "express";
-import urlRoutes from '../src/routes/urlRoutes.js';
+/* =================================== */
 
+import express from "express";
+import urlRoutes from "./routes/urlRoutes.js";
+import cors from 'cors'
+
+/* =================================== */
 const PORT = 3000
 
 const app = express();
 
-app.use('/api',urlRoutes)
+//Middleware
+app.use(express.json())
+app.use(cors())
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+//Frontend
+app.use(express.static('public'))
+app.use('/api', urlRoutes)
+
+app.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`)
+
+})

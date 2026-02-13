@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <title>LinkSwift | Acortador de Links</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="flex items-center justify-center min-h-screen bg-slate-100">
+        <div class="bg-white p-8 rounded-2xl shadow-xl shadow-slate-200 w-full max-w-md border border-slate-100">
+            <h1 class="text-2xl font-bold text-slate-800 mb-2">LinkSwift</h1>
+            <p class="text-slate-500 mb-6 text-sm">Pega tu URL larga y nosotros hacemos el resto.</p>
+
+            <div class="space-y-4">
+                <input type="url" id="urlInput" placeholder="https://tu-url-larga.com"
+                       class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+
+                <button onclick="shorten()" id="btn"
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-colors shadow-lg shadow-blue-200">
+                    Acortar URL
+                </button>
+            </div>
+
+            <div id="result" class="hidden mt-8 p-4 bg-slate-100 rounded-xl border border-slate-200">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Tu link acortado:</p>
+                <div class="flex items-center justify-between">
+                    <a id="shortenedLink" href="#" target="_blank" class="text-blue-600 font-medium break-all mr-2"></a>
+                    <button onclick="copyLink()"
+                            class="text-xs bg-white px-2 py-1 rounded border border-slate-300 hover:bg-slate-50">Copiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            async function shorten() {
+                const urlInput = document.getElementById('urlInput').value;
+                const btn = document.getElementById('btn')
+                const resultDiv = document.getElementById('result');
+                const linkA = document.getElementById('shortenedLink');
+
+
+                if (!urlInput) return alert('Ingrese una URL')
+
+                btn.innerText = 'Acortando...'
+                btn.disabled = true;
+
+
+                try {
+                    const response = await fetch('http://localhost:3000/api/shorten', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({baseURL: urlInput})
+                    })
+
+                    const data = await response.json()
+
+                    linkA.innerText = data.shortURL
+                    linkA.href= data.shortURL
+                    resultDiv.classList.remove('hidden')
+                }catch (e) {
+                    console.error('Error al acortar la URL')
+                    alert('Error al acortar la URL')
+                }finally {
+                    btn.innerText = 'Acortar URL'
+                    btn.disabled = false;
+                }
+
+
+            }
+
+            function copyLink() {
+                const link = document.getElementById('shortenedLink').innerText;
+                navigator.clipboard.writeText(link);
+                alert("¡Copiado al portapapeles!");
+            }
+        </script>
+
+    </body>
+</html>

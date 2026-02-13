@@ -1,31 +1,58 @@
-import * as urlService from "../services/urlService.js";
-import type {RequestHandler} from 'express';
+import { RequestHandler } from "express"
+import { getURL, shortenURL } from "../services/urlService.js"
 
 
 export const createURL: RequestHandler = async (req, res) => {
     try {
-        const {baseURL, userId} = req.body;
+        const {baseURL} = req.body
+
         if (!baseURL) {
-            return res.status(400).json({message: "URL is required"})
+            return res.status(400).json({message: "No se ha enviado la URL"})
         }
 
-        const newURL = await urlService.shortenURL(baseURL, userId);
+        const urlData = await shortenURL(baseURL)
+
         return res.status(201).json(
             {
-                shortURL: newURL.shortURL,
-                baseURL: newURL.baseURL
+                message: "URL creada con exito",
+                shortCode: urlData.shortCode,
+                baseURL: baseURL,
+                shortURL: urlData.shortURL
+            })
+    } catch (e) {
+
+        res.status(500).json(
+            {
+                message: e instanceof Error
+                    ? e.message
+                    : "Error interno del servidor"
             }
         )
+
+    }
+
+
+}
+
+export const getOriginalUrl: RequestHandler = async (req, res) => {
+    try {
+        const {code} = req.params //Extraer el codigo de la URL
+        const originalURL = await getURL(code as string)
+
+        if (!originalURL) {
+            return res.status(404)
+                .json(
+                    {
+                        message: "La URL no existe"
+                    })
+        }
+        return res.status(302).redirect(originalURL)
 
     } catch (e) {
         res.status(500).json({
             message: e instanceof Error
                 ? e.message
-                : "Internal server error"
+                : "Error al redireccionar"
         })
     }
-}
-
-export const getURL: RequestHandler = async (req, res) => {
-    res.json({message:'Hola'})
 }
